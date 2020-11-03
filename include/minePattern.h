@@ -12,7 +12,7 @@ int alphabetLength = 3;
 void _main_mineTrace() {
 
     // Take the input
-    cout << "Enter Regex pattern : ";
+    cout << "Enter Regex pattern (example 0M1M2M3 or 01M2): ";
     cin >> pattern;
 
     cout << "Enter event length (recommended max limit 100): ";
