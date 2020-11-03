@@ -24,20 +24,30 @@ void RagelGenerator::prepareAlphabetArr(int alphabetLength) {
 
         eventRepresentationLength = 1 + to_string(maxBucketSize-1).size(); //Minus 1 is because we are starting from 0 index as A0 -> A9 is 10 elements
         
+        cout << "bucketSize : " << bucketSize << endl;
+        cout << "bucketMoreOver : " << bucketMoreOver << endl;
+        cout << "maxBucketSize : " << maxBucketSize << endl;
+
+        string maxBucketSizeString = to_string(maxBucketSize);
+
         for (int j=0;j<MAX_EVENT_REPRESENTATION;j++) {
             for (int i = 0; i < bucketSize; i++) {
                 string repsentationMarker(1,(char)(97 + j));
-                repsentationMarker += to_string(i);
+                string currentNumber = to_string(i);
+                string prefixer( (maxBucketSizeString.size() - currentNumber.size() ) , '0');
+
+                repsentationMarker += prefixer + to_string(i);
 
                 alphabetArr.push_back(repsentationMarker);
                 alphabetVisitied.push_back(0);
             }
-
+            
             if (bucketMoreOver > 0) {
                 //Insert the bucketMoreOver once horiztally
                 string repsentationMarker(1,(char)(97 + j));
                 string currentNumber = to_string(bucketSize);
-                string prefixer( (maxBucketSize - 1 - currentNumber.size() ) , '0'); //All of this to just make it uniform as A01, A02...A11...A99
+                // string prefixer( (maxBucketSize - 1 - currentNumber.size() ) , '0'); //All of this to just make it uniform as A01, A02...A11...A99
+                string prefixer( (maxBucketSizeString.size() - currentNumber.size() ) , '0');
 
                 repsentationMarker += prefixer + currentNumber;
 
@@ -314,10 +324,14 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
         int isNumber = 0;
 
         while (inp[currentIndex] != '\0') {
+            if (DEBUG) {cout << "For " << inp[currentIndex] << endl;}
             if (inp[currentIndex] >= 48 && inp[currentIndex] <= 57) { //is a number
                 if (isNumber == 0 && currentEventRepresentationLength < eventRepresentationLength) {
                     currentEventRepresentationLength++;
                 } else if (isNumber == 0) { //Count quant only once for 
+                    if (DEBUG) {
+                        cout << "currentQuantCount increased" << endl;
+                    }
                     currentQuantCount++;
                     isNumber = 1;
                     currentEventRepresentationLength = 0;
@@ -335,6 +349,9 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
 
                     //when to apply delimited
                     if (currentQuantCount == quantPlaceholderCount) {
+                        if (DEBUG) {
+                            cout << "currentQuantCount " << currentQuantCount << " quantPlaceholderCount " << quantPlaceholderCount << endl;
+                        }
                         if (currentEventRepresentationLength < eventRepresentationLength) {
                             //Go till the end of the event representation, then do a break.
                             int innerCurrentIndex = currentIndex + 1;
@@ -358,8 +375,8 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
                             }
                         }
 
-                        //inputStream_per_thread[currentThreadIndex] += inp[currentIndex];
-                        //currentEventRepresentationLength++;//increment again for new count after the delimiter
+                        inputStream_per_thread[currentThreadIndex] += inp[currentIndex];
+                        currentEventRepresentationLength++;//increment again for new count after the delimiter
 
                         currentQuantCount = 0;
                     }
@@ -370,6 +387,7 @@ string RagelGenerator::getFullRagelContent(string &fullRagelExpression) {
                 isNumber = 0;
             }
             currentIndex++;
+            if (DEBUG) {cout << "currentQuantCount " << currentQuantCount << endl;}
 
         }
 
@@ -605,19 +623,22 @@ void RagelGenerator::generateRagelFile(string &dynamicRegexExpression, int alpha
         string prefix = "";
         determineQuantPlaceholdersInExpression(dynamicRegexExpression);
         generateExpression(dynamicRegexExpression, 0, 0, alphabetLength, prefix);
-        cout << "overallPattern : " << overallPattern << endl;
+        // cout << "overallPattern : " << overallPattern << endl;
         return;
     }
 
     double t = omp_get_wtime();
     
+    cout << "Will generate expression " << endl;
     string fullRagelExpression = getRagelExpression(dynamicRegexExpression, alphabetLength);
+
+    cout << "Will put the template and get the entire .rl file " << endl;
     string ragelContent = getFullRagelContent(fullRagelExpression);
 
     if (Util::writeToFileFunc(fileName, ragelContent) != 0) {
-    cout << "Ragel FSM file generated successfully" << endl;
+        cout << "Ragel FSM file generated successfully" << endl;
     } else {
-    cout << "Something went wrong" << endl;
+        cout << "Something went wrong" << endl;
     }
 
     printf("[Elapsed time:  %.6f ms]\n", (1000 * (omp_get_wtime() - t)));

@@ -7,6 +7,19 @@
 class Util {
   public:
 
+  static string timestamp_as_string() {
+    time_t rawtime;
+    struct tm * timeinfo;
+    char buffer[80];
+
+    time (&rawtime);
+    timeinfo = localtime(&rawtime);
+
+    strftime(buffer,sizeof(buffer),"%d_%m_%Y_%H_%M_%S",timeinfo);
+    string timestamp(buffer);
+    return timestamp;
+  }
+
   static bool fexists(const string filename) {
     ifstream ifile(filename.c_str());
     return (bool) ifile;

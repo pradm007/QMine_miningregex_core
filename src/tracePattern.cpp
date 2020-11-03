@@ -128,8 +128,8 @@ void TracePattern::loadAndTrace() {
 
 
   char *input = "";
-//   ifstream myfile("./traceBin/trace");
-  ifstream myfile("./traceBin/arrhythmia_cleaned.data");
+  ifstream myfile("./traceBin/trace");
+//   ifstream myfile("./traceBin/arrhythmia_cleaned.data");
   string inp;
   if (myfile.is_open()) {
     inp.assign( (istreambuf_iterator<char>(myfile) ), (istreambuf_iterator<char>()) );
@@ -150,7 +150,7 @@ void TracePattern::loadAndTrace() {
       unordered_map<string, vector<vector<string> > >* patternMap = f(input);
 
       if (CSVOUTPUT && inp.size() < 10000000) { //10 MB
-        string outputFile = "./output/mine-map.csv";
+        string outputFile = "./output/mine-map"+Util::timestamp_as_string()+".csv";
         if (Util::writeToCSV(outputFile, *patternMap) != 0) {
           cout << "Output file generated successfully" << endl;
         } else {

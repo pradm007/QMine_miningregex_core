@@ -28,7 +28,7 @@ void _main_mineTrace() {
         
         string exec = "ragel -C -T0 ./bin/fsm.rl -o ./bin/fsm.cpp && g++ -std=c++11 -fopenmp -Ofast -fpic -w -g -shared -D THREADS=" + to_string(THREADS) + " -D DISPLAY_MAP=" + to_string(DISPLAY_MAP) + " -o ./bin/fsm.so -ldl ./bin/fsm.cpp -ldl";
 
-        // cout << "exec " << exec << endl;
+        cout << "exec " << exec << endl;
         system(exec.c_str());
 
         printf("State machine created successfully [Elapsed time: %.6f ms]\n", (1000 * (omp_get_wtime() - t)));
@@ -37,7 +37,7 @@ void _main_mineTrace() {
         return;
     }
 
-    // // Perform mining
+    // Perform mining
     TracePattern tp; 
     tp.loadAndTrace();
 }
