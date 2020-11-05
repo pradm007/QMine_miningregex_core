@@ -11,7 +11,9 @@
 
 int main(int argc, char *argv[]) {
 
-  if (!strcmp("tracegen", argv[argc - 1])) {
+  if (!strcmp("server", argv[argc - 1])) {
+    _main_serverTrace();
+  } else if (!strcmp("tracegen", argv[argc - 1])) {
     _main_generateTrace();
   } else {
     _main_mineTrace();

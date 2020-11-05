@@ -116,7 +116,8 @@ void TracePattern::loopAndPresentData(string &patternKey, vector<vector<string> 
 /**
  * Function to load the trace and perform mining
  */
-void TracePattern::loadAndTrace() {
+void TracePattern::loadAndTrace(RequestObject reqObj) {
+
   void *lib = dlopen(shareObject_FileName.c_str(), RTLD_NOW);
   if (!lib) {
     printf("dlopen failed: %s\n", dlerror());
@@ -128,7 +129,8 @@ void TracePattern::loadAndTrace() {
 
 
   char *input = "";
-  ifstream myfile("./traceBin/trace");
+  ifstream myfile(reqObj.input_file_path);
+//   ifstream myfile("./traceBin/trace");
 //   ifstream myfile("./traceBin/arrhythmia_cleaned.data");
   string inp;
   if (myfile.is_open()) {
@@ -149,10 +151,14 @@ void TracePattern::loadAndTrace() {
       printf("Dynamic Linker loaded successfully\n");
       unordered_map<string, vector<vector<string> > >* patternMap = f(input);
 
-      if (CSVOUTPUT && inp.size() < 10000000) { //10 MB
+      if (SERVER_MODE || (CSVOUTPUT && inp.size() < 10000000)) { //10 MB
         string outputFile = "./output/mine-map"+Util::timestamp_as_string()+".csv";
         if (Util::writeToCSV(outputFile, *patternMap) != 0) {
+		  reqObj.output_file_path = outputFile;
+		  reqObj.status = to_string(2);
+		  
           cout << "Output file generated successfully" << endl;
+		  
         } else {
           cout << "Something went wrong while generating output file" << endl;
         }
@@ -160,7 +166,7 @@ void TracePattern::loadAndTrace() {
 
       int quit = 0;
       string inputString = "";
-      while(!quit) {
+      while(!quit && !SERVER_MODE) {
         cout << "Enter pattern that you are interested with specific event symbol (Enter N to quit) : ";
         inputString = "a[0-9]+b";
         cin >> inputString;
@@ -202,7 +208,16 @@ void TracePattern::loadAndTrace() {
     
 	  printf("Full trace completed [Elapsed time: %.6f ms]\n", (1000 * (omp_get_wtime() - t)));
   } else {
+	reqObj.status = to_string(3);
     cout << "File might be empty. Size detected " << inp.size() << endl;
+  }
+  
+  if (SERVER_MODE) {
+	try {
+		RedisUtil::insertOrUpdate(reqObj);
+	} catch (const Error &e) {
+		cout << e.what() << endl;
+	}
   }
 
   dlclose(lib);

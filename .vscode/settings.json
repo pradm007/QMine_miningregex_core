@@ -21,6 +21,7 @@
         "istream": "cpp",
         "map": "cpp",
         "ostream": "cpp",
-        "iomanip": "cpp"
+        "iomanip": "cpp",
+        "stdexcept": "cpp"
     }
 }

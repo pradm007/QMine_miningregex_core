@@ -9,18 +9,11 @@
 string pattern = "0M1M2";
 int alphabetLength = 3;
 
-void _main_mineTrace() {
-
-    // Take the input
-    cout << "Enter Regex pattern (example 0M1M2M3 or 01M2): ";
-    cin >> pattern;
-
-    cout << "Enter event length (recommended max limit 100): ";
-    cin >> alphabetLength;
-
+void invoke_mineTrace(RequestObject reqObj) {
     // Generate ragel file
     RagelGenerator rg;
-    rg.generateRagelFile(pattern, alphabetLength);
+    // cout << "reqObj.event_length " << reqObj.event_length << endl;
+    rg.generateRagelFile(reqObj.pattern, stoi(reqObj.event_length));
 
     // Compile ragel file
     if (Util::fexists("./bin/fsm.rl")) {
@@ -39,7 +32,51 @@ void _main_mineTrace() {
 
     // Perform mining
     TracePattern tp; 
-    tp.loadAndTrace();
+    tp.loadAndTrace(reqObj);
+}
+
+void _main_mineTrace() {
+
+    // Take the input
+    cout << "Enter Regex pattern (example 0M1M2M3 or 01M2): ";
+    cin >> pattern;
+
+    cout << "Enter event length (recommended max limit 100): ";
+    cin >> alphabetLength;
+
+    RequestObject reqObj;
+    reqObj.pattern = pattern;
+    reqObj.event_length = to_string(alphabetLength);
+    reqObj.input_file_path = "./traceBin/trace"; // "./traceBin/arrhythmia_cleaned.data"
+    reqObj.status = 1;
+    
+    invoke_mineTrace(reqObj);
+}
+
+void _main_serverTrace_threaded() {
+    unsigned millisecond = 15000;
+    while (true) {
+      
+      try {
+        RequestObject reqObj = RedisUtil::getLastRequestObject();
+        
+        if (stoi(reqObj.status) == 1) {
+            invoke_mineTrace(reqObj);
+        }
+        
+      } catch (const Error &e) {
+        cout << e.what() << endl;
+      }
+      
+      cout << fixed << setprecision(2) << "Sleeping... for " << (double) (millisecond/1000) << " seconds  " << endl << endl;
+      this_thread::sleep_for(chrono::milliseconds(millisecond));
+        
+    }
+}
+
+void _main_serverTrace() {
+  thread qmine(_main_serverTrace_threaded);
+  qmine.join();
 }
 
 #endif
