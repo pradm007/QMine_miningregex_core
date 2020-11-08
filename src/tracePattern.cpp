@@ -152,7 +152,8 @@ void TracePattern::loadAndTrace(RequestObject reqObj) {
       unordered_map<string, vector<vector<string> > >* patternMap = f(input);
 
       if (SERVER_MODE || (CSVOUTPUT && inp.size() < 10000000)) { //10 MB
-        string outputFile = "./output/mine-map"+Util::timestamp_as_string()+".csv";
+        string outputFile = ((reqObj.output_file_path.size() > 0) ? reqObj.output_file_path :  "./output/") + "mine-map"+Util::timestamp_as_string()+".csv";
+		
         if (Util::writeToCSV(outputFile, *patternMap) != 0) {
 		  reqObj.output_file_path = outputFile;
 		  reqObj.status = to_string(2);
