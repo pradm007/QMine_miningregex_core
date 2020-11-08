@@ -37,3 +37,9 @@ output/*
 
 bin/*
 lab/bin/*
+
+# exception to the rule. Keep few files
+!traceBin/.gitkeep
+!output/.gitkeep
+!bin/.gitkeep
+!traceBin/trace
