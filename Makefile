@@ -13,8 +13,10 @@ THREADS := 8
 CSVOUTPUT := 1
 DISPLAY_MAP :=1
 
-LIBREDIS := /home/pradeep/Redis_C++/redis-plus-plus/compile/lib/libredis++.a
-LIBHIREDIS := /home/pradeep/Redis_C++/hiredis/libhiredis.a
+# LIBREDIS := /home/pradeep/Redis_C++/redis-plus-plus/compile/lib/libredis++.a
+# LIBHIREDIS := /home/pradeep/Redis_C++/hiredis/libhiredis.a
+LIBREDIS := /usr/local/redis-plus-plus/compile/lib/libredis++.a
+LIBHIREDIS := /usr/local/hiredis/libhiredis.a
 
 LIBRARIES	:= src/ragelGenerator.cpp src/tracePattern.cpp
 
