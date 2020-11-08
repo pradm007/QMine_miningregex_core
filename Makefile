@@ -13,6 +13,9 @@ THREADS := 8
 CSVOUTPUT := 1
 DISPLAY_MAP :=1
 
+LIBREDIS := /home/pradeep/Redis_C++/redis-plus-plus/compile/lib/libredis++.a
+LIBHIREDIS := /home/pradeep/Redis_C++/hiredis/libhiredis.a
+
 LIBRARIES	:= src/ragelGenerator.cpp src/tracePattern.cpp
 
 ifeq ($(OS),Windows_NT)
@@ -41,10 +44,10 @@ main:
 	
 server:
 	d=$$(date +%s)\
-	; $(CC) $(C_FLAGS) -D SERVER_MODE=1 -D THREADS=$(THREADS) -D CSVOUTPUT=$(CSVOUTPUT) -D DISPLAY_MAP=$(DISPLAY_MAP) -I$(INCLUDE) -L$(LIB) $(SRC)/$(EXECUTABLE).cpp -$(SO_FLAG) -o $(BIN)/$(EXECUTABLE) $(LIBRARIES) -$(SO_FLAG) /home/pradeep/Redis_C++/redis-plus-plus/compile/lib/libredis++.a /home/pradeep/Redis_C++/hiredis/libhiredis.a -pthread	\
+	; $(CC) $(C_FLAGS) -D SERVER_MODE=1 -D THREADS=$(THREADS) -D CSVOUTPUT=$(CSVOUTPUT) -D DISPLAY_MAP=$(DISPLAY_MAP) -I$(INCLUDE) -L$(LIB) $(SRC)/$(EXECUTABLE).cpp -$(SO_FLAG) -o $(BIN)/$(EXECUTABLE) $(LIBRARIES) -$(SO_FLAG) $(LIBREDIS) $(LIBHIREDIS) -pthread	\
 	&& echo "Build took $$(($$(date +%s)-d)) seconds"
-	./$(BIN)/$(EXECUTABLE) $(COMMAND_SERVER)
 
+	./$(BIN)/$(EXECUTABLE) $(COMMAND_SERVER)
 run: all
 	./$(BIN)/$(EXECUTABLE)
 
