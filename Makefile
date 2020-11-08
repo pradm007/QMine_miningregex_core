@@ -49,9 +49,11 @@ server:
 	; $(CC) $(C_FLAGS) -D SERVER_MODE=1 -D THREADS=$(THREADS) -D CSVOUTPUT=$(CSVOUTPUT) -D DISPLAY_MAP=$(DISPLAY_MAP) -I$(INCLUDE) -L$(LIB) $(SRC)/$(EXECUTABLE).cpp -$(SO_FLAG) -o $(BIN)/$(EXECUTABLE) $(LIBRARIES) -$(SO_FLAG) $(LIBREDIS) $(LIBHIREDIS) -pthread	\
 	&& echo "Build took $$(($$(date +%s)-d)) seconds"
 
-	./$(BIN)/$(EXECUTABLE) $(COMMAND_SERVER)
 run: all
 	./$(BIN)/$(EXECUTABLE)
 
+runserver: 
+	./$(BIN)/$(EXECUTABLE) $(COMMAND_SERVER)
+	
 $(BIN)/$(EXECUTABLE): $(SRC)/*.cpp
 	$(CC) $(C_FLAGS) -I$(INCLUDE) -L$(LIB) $^ -$(SO_FLAG) -o $@ $(LIBRARIES)
