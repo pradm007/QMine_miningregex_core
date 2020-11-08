@@ -21,10 +21,11 @@ void invoke_mineTrace(RequestObject reqObj) {
         
         string exec = "ragel -C -T0 ./bin/fsm.rl -o ./bin/fsm.cpp && g++ -std=c++11 -fopenmp -Ofast -fpic -w -g -shared -D THREADS=" + to_string(THREADS) + " -D DISPLAY_MAP=" + to_string(DISPLAY_MAP) + " -o ./bin/fsm.so -ldl ./bin/fsm.cpp -ldl";
 
-        cout << "exec " << exec << endl;
+        cout << Util::timestamp_as_string() << ": "<< "exec " << exec << endl;
         system(exec.c_str());
 
         printf("State machine created successfully [Elapsed time: %.6f ms]\n", (1000 * (omp_get_wtime() - t)));
+        cout << fixed << setprecision(2) << Util::timestamp_as_string() << ": " << "State machine created successfully [Elapsed time: " << (1000 * (omp_get_wtime() - t)) << " ms]" << endl;
     } else {
         perror("Ragel file not found !!");
         return;
@@ -60,7 +61,7 @@ void _main_serverTrace_threaded() {
       try {
         RequestObject reqObj = RedisUtil::getLastRequestObject();
         
-        if (stoi(reqObj.status) == 1) {
+        if (!reqObj.status.empty() && stoi(reqObj.status) == 1) {
             invoke_mineTrace(reqObj);
         }
         
@@ -68,7 +69,7 @@ void _main_serverTrace_threaded() {
         cout << e.what() << endl;
       }
       
-      cout << fixed << setprecision(2) << "Sleeping... for " << (double) (millisecond/1000) << " seconds  " << endl << endl;
+      cout << fixed << setprecision(2) << Util::timestamp_as_string() << ": " <<  "No (pending) job found. Sleeping for " << (double) (millisecond/1000) << " seconds !! " << endl << endl;
       this_thread::sleep_for(chrono::milliseconds(millisecond));
         
     }

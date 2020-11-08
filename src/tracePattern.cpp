@@ -137,7 +137,7 @@ void TracePattern::loadAndTrace(RequestObject reqObj) {
     inp.assign( (istreambuf_iterator<char>(myfile) ), (istreambuf_iterator<char>()) );
     myfile.close();
   } else {
-    cout << "Something went wrong while opening file" << endl;
+    cout << Util::timestamp_as_string() << ": " << "Something went wrong while opening file" << endl;
   }
 
   input = (char *)malloc((inp.size() + 1) * sizeof(char *));
@@ -158,10 +158,10 @@ void TracePattern::loadAndTrace(RequestObject reqObj) {
 		  reqObj.output_file_path = outputFile;
 		  reqObj.status = to_string(2);
 		  
-          cout << "Output file generated successfully" << endl;
+          cout << Util::timestamp_as_string() << ": " << "Output file generated successfully" << endl;
 		  
         } else {
-          cout << "Something went wrong while generating output file" << endl;
+          cout << Util::timestamp_as_string() << ": " << "Something went wrong while generating output file" << endl;
         }
       }
 
@@ -203,14 +203,14 @@ void TracePattern::loadAndTrace(RequestObject reqObj) {
 
         
     } else {
-      printf("Dynamic Linker loaded failed\n");
-      printf("dlsym for function grab failed: %s\n", dlerror());
+	  cout << Util::timestamp_as_string() << ": "  << "Dynamic Linker loaded failed" << endl;
+	  cout << Util::timestamp_as_string() << ": " << "dlsym for function grab failed: " << dlerror() << endl;
     }
     
-	  printf("Full trace completed [Elapsed time: %.6f ms]\n", (1000 * (omp_get_wtime() - t)));
+	  cout << fixed << setprecision(2) << Util::timestamp_as_string() << ": " << "Full trace completed [Elapsed time: " << (1000 * (omp_get_wtime() - t)) << " ms]" << endl;
   } else {
 	reqObj.status = to_string(3);
-    cout << "File might be empty. Size detected " << inp.size() << endl;
+    cout << Util::timestamp_as_string() << ": " << "File might be empty. Size detected " << inp.size() << endl;
   }
   
   if (SERVER_MODE) {

@@ -29,7 +29,9 @@ class RedisUtil {
       
       RequestObject reqObj;
       if (obj.size() == 0) {
-        throw Error("No entry found in Redis !!");
+        // throw Error("No entry found in Redis !!");
+        // cout << "No (pending) entry found in Redis !!";
+        return reqObj;
       }
       
       for (auto it= obj.begin(); it!=obj.end();it++) {
